@@ -1,10 +1,11 @@
 from django.db.models import Q
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from missions.models import Mission, Target
-from missions.serializers import MissionSerializer
+from missions.serializers import MissionSerializer, TargetSerializer
 
 
 class MissionViewSet(viewsets.ModelViewSet):
@@ -75,3 +76,22 @@ class MissionViewSet(viewsets.ModelViewSet):
         mission.save()
 
         return Response(self.get_serializer(mission).data)
+
+
+class TargetViewSet(viewsets.ModelViewSet):
+    queryset = Target.objects.all()
+    serializer_class = TargetSerializer
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+    def update(self, request, *args, **kwargs):
+        target = self.get_object()
+
+        if "notes" in request.data:
+            if target.is_complete or target.mission.is_complete:
+                raise ValidationError(
+                    "Cannot update notes because the target or the mission is already completed."
+                )
+
+        return super().update(request, *args, **kwargs)
