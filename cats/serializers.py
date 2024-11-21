@@ -22,7 +22,6 @@ class CatSerializer(serializers.ModelSerializer):
         model = Cat
         fields = ["id", "name", "years_of_experience", "breed", "salary"]
 
-
     @staticmethod
     def validate_breed(self, value):
         if not BreedValidationService.validate_breed(value):
