@@ -19,7 +19,7 @@ class MissionSerializer(serializers.ModelSerializer):
     @staticmethod
     def validate_targets(targets):
         if len(targets) < 1 or len(targets) > 3:
-            raise serializers.ValidationError("A mission must have 1-3 targets")
+            raise serializers.ValidationError("A mission requires 1-3 targets")
         return targets
 
     def create(self, validated_data):
