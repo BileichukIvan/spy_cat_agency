@@ -89,7 +89,7 @@ class TargetViewSet(viewsets.ModelViewSet):
         target = self.get_object()
 
         if "notes" in request.data:
-            if target.is_complete or target.mission.is_complete:
+            if target.missions.filter(is_complete=True).exists():
                 raise ValidationError(
                     "Cannot update notes because the target or the mission is already completed."
                 )
