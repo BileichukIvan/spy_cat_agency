@@ -1,20 +1,22 @@
+from requests.exceptions import RequestException
 from rest_framework import serializers
 import requests
-from rest_framework.exceptions import ValidationError
 
 from cats.models import Cat
 
 
 class BreedValidationService:
+
     @staticmethod
     def validate_breed(breed):
-        response = requests.get(
-            f"https://api.thecatapi.com/v1/breeds/{breed}"
-        )
-        if response.status_code != 200:
-            raise ValidationError("This breed is not maintains")
-
-        return breed
+        try:
+            response = requests.get(
+                "https://api.thecatapi.com/v1/breeds/search", params={"q": breed}
+            )
+            return len(response.json()) > 0
+        except RequestException as req_err:
+            print(f"An error occurred while making the request: {req_err}")
+            return False
 
 
 class CatSerializer(serializers.ModelSerializer):
