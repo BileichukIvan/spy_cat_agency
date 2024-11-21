@@ -9,7 +9,7 @@ class BreedValidationService:
     @staticmethod
     def validate_breed(breed):
         response = requests.get(
-            "https://api.thecatapi.com/v1/breeds/search", params={"q": breed}
+            f"https://api.thecatapi.com/v1/breeds/{breed}"
         )
         if response.status_code != 200:
             raise ValidationError("This breed is not maintains")
@@ -23,7 +23,7 @@ class CatSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "years_of_experience", "breed", "salary"]
 
     @staticmethod
-    def validate_breed(self, value):
+    def validate_breed(value):
         if not BreedValidationService.validate_breed(value):
             raise serializers.ValidationError("Invalid cat breed")
         return value
