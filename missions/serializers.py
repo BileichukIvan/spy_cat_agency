@@ -8,9 +8,14 @@ class TargetSerializer(serializers.ModelSerializer):
         model = Target
         fields = ["id", "name", "country", "notes", "is_complete"]
 
+    def validate(self, data):
+        if "notes" in data and data.get("is_complete"):
+            raise serializers.ValidationError("Cannot update notes for a completed target.")
+        return data
+
 
 class MissionSerializer(serializers.ModelSerializer):
-    targets = TargetSerializer(many=True)
+    targets = serializers.PrimaryKeyRelatedField(queryset=Target.objects.all(), many=True)
 
     class Meta:
         model = Mission
@@ -26,8 +31,6 @@ class MissionSerializer(serializers.ModelSerializer):
         targets_data = validated_data.pop("targets")
         mission = Mission.objects.create(**validated_data)
 
-        for target_data in targets_data:
-            target = Target.objects.create(**target_data)
-            mission.targets.add(target)
+        mission.targets.set(targets_data)
 
         return mission
